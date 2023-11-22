@@ -6,7 +6,7 @@ The CSV file contains the following columns:
 - Case
 - Place
 - Title
-- -Text
+- Text
 
 The JSON file jas the following structure:
 ```

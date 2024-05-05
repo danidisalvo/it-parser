@@ -1,0 +1,43 @@
+package com.probendi.itparser;
+
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class JsonWriterIT {
+
+    @Test
+    void write() throws IOException {
+        Set<Entry> entries = new LinkedHashSet<>();
+        entries.add(new Entry(1, 2, "work 1", "work 1, a", "abc"));
+        entries.add(new Entry(3, 4, "work 2", "work 2, a", "xyz"));
+
+        new JsonWriter().write("test.json", entries);
+
+        Path path = Paths.get("test.json");
+        List<String> lines = Files.readAllLines(path);
+        assertEquals(4, lines.size(), "the file has the wrong size");
+        assertEquals("{\"entries\":[", lines.get(0));
+        assertEquals("{\"caseNumber\":1," +
+                "\"placeNumber\":2," +
+                "\"work\":\"work 1\"," +
+                "\"position\":\"work 1, a\"," +
+                "\"text\":\"abc\"" +
+                "},", lines.get(1));
+        assertEquals("{\"caseNumber\":3," +
+                "\"placeNumber\":4," +
+                "\"work\":\"work 2\"," +
+                "\"position\":\"work 2, a\"," +
+                "\"text\":\"xyz\"" +
+                "}", lines.get(2));
+        assertEquals("]}", lines.get(3));
+    }
+}

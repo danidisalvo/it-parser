@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * An entry to be written to a CVS and a JSON file.
+ * An entry parsed from the <a href="https://www.corpusthomisticum.org/it/index.age">Index Thomisticus</a>.
  *
  * @param caseNumber  the case number
  * @param placeNumber the place number
@@ -25,10 +25,7 @@ public record Entry(int caseNumber,
 
     private static final String CASE = "Case ";
     private static final String COMMA = ",";
-    private static final String CSV_FORMAT = "%d\t%d\t%s\t%s\t%s\n";
     private static final String DOT = ".";
-    private static final String JSON_FORMAT =
-            "{\"caseNumber\":%d,\"placeNumber\":%d,\"work\":\"%s\",\"position\":\"%s\",\"text\":\"%s\"}";
     private static final String NBSP = "&nbsp;";
     private static final String PLACE = "Place ";
     private static final String SPAN = "</span>";
@@ -96,24 +93,6 @@ public record Entry(int caseNumber,
             throw new IllegalArgumentException("entry cannot be null");
         }
         return Integer.compare(caseNumber, entry.caseNumber);
-    }
-
-    /**
-     * Return this entry as a CSV string.
-     *
-     * @return this entry as a CSV string
-     */
-    public String toCsv() {
-        return String.format(CSV_FORMAT, caseNumber, placeNumber, work, position, text);
-    }
-
-    /**
-     * Return this entry as a JSON string.
-     *
-     * @return this entry as a JSON string
-     */
-    public String toJson() {
-        return String.format(JSON_FORMAT, caseNumber, placeNumber, work, position, text);
     }
 
     /**

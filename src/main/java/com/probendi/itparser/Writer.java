@@ -1,7 +1,7 @@
 package com.probendi.itparser;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Writes entries to a file.
@@ -21,7 +21,7 @@ public interface Writer {
      * @throws IllegalArgumentException if file is {@code null} or empty, or if entries is {@code null}
      * @throws IOException              if an I/O error occurs
      */
-    void write(String file, Set<Entry> entries) throws IOException;
+    void write(String file, Collection<ConsolidatedEntry> entries) throws IOException;
 
     /**
      * Validates the given file and entries.
@@ -31,7 +31,7 @@ public interface Writer {
      * @return the trimmed file's name
      * @throws IllegalArgumentException if file is {@code null} or empty, or if entries is {@code null}
      */
-    default String validate(String file, Set<Entry> entries) {
+    default String validate(String file, Collection<ConsolidatedEntry> entries) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null");
         }

@@ -5,9 +5,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
@@ -146,16 +148,27 @@ public class Crawler {
     /**
      * Searches the {@code Index Thomisticus} for all occurrences of the given {@code term}'s {@code forms}.
      *
-     * @return a set of {@link Entry} objects
+     * @return a list of {@link ConsolidatedEntry} objects
      * @throws IOException          if an I/O error occurs
      * @throws InterruptedException if the thread is interrupted
      */
-    public Set<Entry> crawl() throws IOException, InterruptedException {
+    public List<ConsolidatedEntry> crawl() throws IOException, InterruptedException {
         String sessionId = sendNewSearchRequest();
         sendTermRequest(sessionId);
         sendFormsRequest(sessionId);
         sendWorksRequest(sessionId);
-        return sendConcordancesRequest(sessionId);
+
+        List<ConsolidatedEntry> entries = new ArrayList<>();
+        sendConcordancesRequest(sessionId).forEach(e -> {
+            ConsolidatedEntry entry = new ConsolidatedEntry(e);
+            int size = entries.size() -1;
+            if (size < 0 || !entries.get(size).equals(entry)) {
+                entries.add(entry);
+            } else {
+                entries.get(size).addText(entry.text());
+            }
+        });
+        return entries;
     }
 
     /**
@@ -296,7 +309,7 @@ public class Crawler {
         int n = body.indexOf(" cases in ");
         System.out.println(body.substring(m, n) + " cases");
 
-        final Set<Entry> entries = new LinkedHashSet<>();
+        Set<Entry> entries = new TreeSet<>();
         Pattern.compile("<p title=.*")
                 .matcher(body)
                 .results()

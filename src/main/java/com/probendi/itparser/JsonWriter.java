@@ -3,7 +3,7 @@ package com.probendi.itparser;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Writes entries to a JSON file.
@@ -16,13 +16,13 @@ import java.util.Set;
 public class JsonWriter implements Writer {
 
     @Override
-    public void write(String file, Set<Entry> entries) throws IOException {
+    public void write(String file, Collection<ConsolidatedEntry> entries) throws IOException {
         String name = validate(file, entries);
         boolean first = true;
         try (final FileWriter fw = new FileWriter(name);
              final BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write("{\"entries\":[\n");
-            for (final Entry entry : entries) {
+            for (final ConsolidatedEntry entry : entries) {
                 if (!first) {
                     bw.write(",\n");
                 } else {

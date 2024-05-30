@@ -3,7 +3,7 @@ package com.probendi.itparser;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Writes entries to a CSV file.
@@ -15,15 +15,15 @@ import java.util.Set;
  */
 public class CsvWriter implements Writer {
 
-    private static final String HEADER = "Case\tPlace\tWork\tPosition\tText\n";
+    private static final String HEADER = "Work\tPosition\tText\n";
 
     @Override
-    public void write(String file, Set<Entry> entries) throws IOException {
+    public void write(String file, Collection<ConsolidatedEntry> entries) throws IOException {
         String name = validate(file, entries);
         try (final FileWriter fw = new FileWriter(name);
              final BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(HEADER);
-            for (Entry entry : entries) {
+            for (ConsolidatedEntry entry : entries) {
                 bw.write(entry.toCsv());
             }
         }

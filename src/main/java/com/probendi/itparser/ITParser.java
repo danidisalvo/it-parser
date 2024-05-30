@@ -3,8 +3,8 @@ package com.probendi.itparser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * Queries the <a href="https://www.corpusthomisticum.org/it/index.age">Index Thomisticus</a>, parses the query's
@@ -56,7 +56,7 @@ public class ITParser {
 
         Crawler crawler = new Crawler(term, forms);
         try {
-            Set<Entry> entries = crawler.crawl();
+            List<ConsolidatedEntry> entries = crawler.crawl();
             new CsvWriter().write(CSV_FILE, entries);
             new JsonWriter().write(JSON_FILE, entries);
 

@@ -38,7 +38,7 @@ the term's forms to be searched.
 For example:
 
 ```
-java -jar target/it-parserl-2.0.jar ens 78 79 80 81 82 83 84 85 86 87
+java -jar target/it-parser.jar ens 78 79 80 81 82 83 84 85 86 87
 ```
 
 searches for `ens`, `entis`, `enti`, `entem`, `ente`, `enter`, `entes`, `entia`, `entium`, and `entibus`.

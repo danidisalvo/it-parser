@@ -38,6 +38,8 @@ public class ITParser {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+
         if (args.length < 1) {
             System.out.println(USAGE);
             System.exit(-1);
@@ -57,6 +59,8 @@ public class ITParser {
             Set<Entry> entries = crawler.crawl();
             new CsvWriter().write(CSV_FILE, entries);
             new JsonWriter().write(JSON_FILE, entries);
+
+            System.out.printf("execution time: %d s\n", (System.currentTimeMillis() - start) / 1000);
         } catch (IOException | InterruptedException e) {
             System.err.println(e.getMessage());
             System.exit(-1);

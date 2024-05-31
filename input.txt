@@ -1,0 +1,5 @@
+ens 78 79 80 81 82 83 84 85 86 87
+#26153
+"id quod est"
+"ea quae sunt"
+"omnia sunt"

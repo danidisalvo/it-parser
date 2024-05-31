@@ -6,7 +6,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Searches the <a href="https://www.corpusthomisticum.org/it/index.age">Index Thomisticus</a>.for all occurrences of
  * the forms of a term.
- *
+ * <p>
  * Copyright &copy; 2023-2024, Daniele Di Salvo
  *
  * @author Daniele Di Salvo
@@ -124,25 +123,18 @@ public class Crawler {
             "&Form.option.concordances=concordances";
 
     private final HttpClient client = HttpClient.newHttpClient();
-    private final String term;
-    private final String[] forms;
+    private final List<String> lines;
 
     /**
      * Creates a new {@code Crawler} with the given parameters.
      *
-     * @param term  the term, e.g., {@code ens}
-     * @param forms the lemma's forms, e.g., {@code 78} (ens) and {@code 79} (entis)
+     * @param lines a list of freely mixed terms, e.g., {@code ens}, lemmas, e.g., {@code #26153},
+     *              and expression, e.g., {@code "id quod est"}.
+     *              A term can be followed by one or more forms, e.g., {@code 78} (ens) and {@code 79} (entis)
      * @throws IllegalArgumentException if term is {@code null} or empty, or if forms is {@code null}
      */
-    public Crawler(String term, String[] forms) {
-        if (term == null || term.trim().isEmpty()) {
-            throw new IllegalArgumentException("term cannot be null or empty");
-        }
-        if (forms == null) {
-            throw new IllegalArgumentException("forms cannot be null");
-        }
-        this.term = term;
-        this.forms = forms;
+    public Crawler(List<String> lines) {
+        this.lines = lines;
     }
 
     /**
@@ -153,22 +145,36 @@ public class Crawler {
      * @throws InterruptedException if the thread is interrupted
      */
     public List<ConsolidatedEntry> crawl() throws IOException, InterruptedException {
-        String sessionId = sendNewSearchRequest();
-        sendTermRequest(sessionId);
-        sendFormsRequest(sessionId);
-        sendWorksRequest(sessionId);
+        Set<Entry> entries = new TreeSet<>();
 
-        List<ConsolidatedEntry> entries = new ArrayList<>();
-        sendConcordancesRequest(sessionId).forEach(e -> {
-            ConsolidatedEntry entry = new ConsolidatedEntry(e);
-            int size = entries.size() -1;
-            if (size < 0 || !entries.get(size).equals(entry)) {
-                entries.add(entry);
+        for (String line : lines) {
+            String sessionId = sendNewSearchRequest();
+
+            String term;
+            if (!line.startsWith("#") && !line.startsWith("\"")) {
+                String[] strings = line.split(" ");
+                term = strings[0];
+                sendTermRequest(sessionId, term);
+                sendFormsRequest(sessionId, strings);
             } else {
-                entries.get(size).addText(entry.text());
+                term = line;
+            }
+
+            sendWorksRequest(sessionId, term);
+            entries.addAll(sendConcordancesRequest(sessionId, term));
+        }
+
+        List<ConsolidatedEntry> consolidatedEntries = new ArrayList<>();
+        entries.forEach(e -> {
+            ConsolidatedEntry entry = new ConsolidatedEntry(e);
+            int size = consolidatedEntries.size() - 1;
+            if (size < 0 || !consolidatedEntries.get(size).equals(entry)) {
+                consolidatedEntries.add(entry);
+            } else {
+                consolidatedEntries.get(size).addText(entry.text());
             }
         });
-        return entries;
+        return consolidatedEntries;
     }
 
     /**
@@ -197,11 +203,12 @@ public class Crawler {
      * Sends the 'term' request.
      *
      * @param sessionId the session's ID
+     * @param term      the term
      * @throws IllegalArgumentException if sessionId is {@code null}
-     * @throws IOException          if an I/O error occurs
-     * @throws InterruptedException if the thread is interrupted
+     * @throws IOException              if an I/O error occurs
+     * @throws InterruptedException     if the thread is interrupted
      */
-    protected void sendTermRequest(String sessionId) throws IOException, InterruptedException {
+    protected void sendTermRequest(String sessionId, String term) throws IOException, InterruptedException {
         if (sessionId == null) {
             throw new IllegalArgumentException("sessionId cannot be null");
         }
@@ -223,17 +230,24 @@ public class Crawler {
      * Sends the 'forms' request.
      *
      * @param sessionId the session's ID
+     * @param strings   the term and its forms, if any
      * @throws IllegalArgumentException if sessionId is {@code null}
-     * @throws IOException          if an I/O error occurs
-     * @throws InterruptedException if the thread is interrupted
+     * @throws IOException              if an I/O error occurs
+     * @throws InterruptedException     if the thread is interrupted
      */
-    protected void sendFormsRequest(String sessionId) throws IOException, InterruptedException {
+    protected void sendFormsRequest(String sessionId, String[] strings) throws IOException, InterruptedException {
         if (sessionId == null) {
             throw new IllegalArgumentException("sessionId cannot be null");
         }
-        StringBuilder reqBody = new StringBuilder(String.format("text=%s&Form.option.works=works", term));
+        if (strings.length == 1) {
+            // the term has no forms
+            return;
+        }
+        StringBuilder reqBody = new StringBuilder(String.format("text=%s&Form.option.works=works", strings[0]));
         String format = "&terms%%5B0%%5D.listedLemmata%%5B0%%5D.listedFormae%%5B%s%%5D.selected=on";
-        Arrays.stream(forms).forEach(form -> reqBody.append(String.format(format, form)));
+        for (int i = 1; i < strings.length; i++) {
+            reqBody.append(String.format(format, strings[i]));
+        }
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(INDEX_THOMISTICUS)
@@ -252,11 +266,12 @@ public class Crawler {
      * Sends the 'works' request.
      *
      * @param sessionId the session's ID
+     * @param term      the term
      * @throws IllegalArgumentException if sessionId is {@code null}
-     * @throws IOException          if an I/O error occurs
-     * @throws InterruptedException if the thread is interrupted
+     * @throws IOException              if an I/O error occurs
+     * @throws InterruptedException     if the thread is interrupted
      */
-    protected void sendWorksRequest(String sessionId) throws IOException, InterruptedException {
+    protected void sendWorksRequest(String sessionId, String term) throws IOException, InterruptedException {
         if (sessionId == null) {
             throw new IllegalArgumentException("sessionId cannot be null");
         }
@@ -283,12 +298,13 @@ public class Crawler {
      * Sends the 'concordances' request.
      *
      * @param sessionId the session's ID
+     * @param term      the term
      * @return a set of parsed {@link Entry} objects
      * @throws IllegalArgumentException if sessionId is {@code null}
-     * @throws IOException          if an I/O error occurs
-     * @throws InterruptedException if the thread is interrupted
+     * @throws IOException              if an I/O error occurs
+     * @throws InterruptedException     if the thread is interrupted
      */
-    protected Set<Entry> sendConcordancesRequest(String sessionId) throws IOException, InterruptedException {
+    protected Set<Entry> sendConcordancesRequest(String sessionId, String term) throws IOException, InterruptedException {
         if (sessionId == null) {
             throw new IllegalArgumentException("sessionId cannot be null");
         }
@@ -307,7 +323,7 @@ public class Crawler {
         String body = response.body();
         int m = body.indexOf("Found");
         int n = body.indexOf(" cases in ");
-        System.out.println(body.substring(m, n) + " cases");
+        System.out.println(body.substring(m, n) + " cases for " + term);
 
         Set<Entry> entries = new TreeSet<>();
         Pattern.compile("<p title=.*")

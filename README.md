@@ -23,22 +23,20 @@ The JSON file jas the following structure:
 ## How to Build and Run it-parser
 
 ```
-mvn clean package
+mvn clean install
 
-java -jar target/it-parser-2.1.0.jar term [form1] [form2] ...
+java -jar target/it-parser-3.0.0.jar input_file
 ```
 
-where `term` is the term to be searched, and the optional `form1`, `form2` are
-the term's forms to be searched. 
+where `input_file` is the file containing the terms, lemmas and expressions to be searched. 
 
 For example:
 
 ```
-java -jar target/it-parser-2.1.0.jar ens 78 79 80 81 82 83 84 85 86 87
+java -jar target/it-parser-3.0.0.jar input.txt
 ```
 
-searches for `ens`, `entis`, `enti`, `entem`, `ente`, `enter`, `entes`, `entia`, `entium`, and `entibus`.
-
-
-
-
+searches for:
+- `ens`, `entis`, `enti`, `entem`, `ente`, `enter`, `entes`, `entia`, `entium`, and `entibus`;
+- the lemma `#26153`, i.e., the verb `dīvĭdo, dīvĭdis, divisi, divisum, dīvĭdĕre`;
+- the expressions `id quod est`, `ea quae sunt`, and `omnia sunt`.

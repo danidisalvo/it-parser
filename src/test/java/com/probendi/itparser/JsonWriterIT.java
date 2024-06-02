@@ -17,8 +17,8 @@ class JsonWriterIT {
     @Test
     void write() throws IOException {
         Set<ConsolidatedEntry> entries = new LinkedHashSet<>();
-        entries.add(new ConsolidatedEntry(1, "work 1", "work 1, a", List.of("abc")));
-        entries.add(new ConsolidatedEntry(2, "work 2", "work 2, a", List.of("xyz")));
+        entries.add(new ConsolidatedEntry(1, "work 1", "work 1, a", Set.of("abc")));
+        entries.add(new ConsolidatedEntry(2, "work 2", "work 2, a", Set.of("xyz")));
 
         new JsonWriter().write("test.json", entries);
 

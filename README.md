@@ -25,7 +25,7 @@ The JSON file jas the following structure:
 ```
 mvn clean install
 
-java -jar target/it-parser-3.0.0.jar input_file
+java -jar target/it-parser-3.0.1.jar input_file
 ```
 
 where `input_file` is the file containing the terms, lemmas and expressions to be searched. 
@@ -33,7 +33,7 @@ where `input_file` is the file containing the terms, lemmas and expressions to b
 For example:
 
 ```
-java -jar target/it-parser-3.0.0.jar input.txt
+java -jar target/it-parser-3.0.1.jar input.txt
 ```
 
 searches for:

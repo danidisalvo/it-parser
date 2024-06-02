@@ -1,8 +1,9 @@
 package com.probendi.itparser;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * An entry to be written to a CVS and a JSON file.
@@ -16,7 +17,7 @@ import java.util.Objects;
  * @author Daniele Di Salvo
  * @since 2.1
  */
-public record ConsolidatedEntry(int placeNumber, String work, String position, List<String> text) {
+public record ConsolidatedEntry(int placeNumber, String work, String position, Set<String> text) {
 
     private static final String CSV_FORMAT = "%s\t%s\t%s\n";
     private static final String JSON_FORMAT = "{\"work\":\"%s\",\"position\":\"%s\",\"text\":\"%s\"}";
@@ -50,7 +51,7 @@ public record ConsolidatedEntry(int placeNumber, String work, String position, L
      * @param entry an {@link Entry}
      */
     public ConsolidatedEntry(Entry entry) {
-        this(entry.placeNumber(), entry.work(), entry.position(), new LinkedList<>());
+        this(entry.placeNumber(), entry.work(), entry.position(), new LinkedHashSet<>());
         text.add(entry.text());
     }
 
@@ -74,7 +75,7 @@ public record ConsolidatedEntry(int placeNumber, String work, String position, L
     public String toString() {
         String shortText = "";
         if (!text.isEmpty()) {
-            String t = text.get(0);
+            String t = new LinkedList<>(text).get(0);
             shortText = t.length() > 32 ? t.substring(0, 32) : t;
         }
         return "Entry{" +
@@ -90,7 +91,7 @@ public record ConsolidatedEntry(int placeNumber, String work, String position, L
      *
      * @param strings the strings to be added
      */
-    public void addText(List<String> strings) {
+    public void addText(Set<String> strings) {
         text.addAll(strings);
     }
 

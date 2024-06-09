@@ -16,7 +16,7 @@ import java.util.List;
  *     <li>Text</li>
  * </ul>
  * Furthermore, it generates a JSON file consisting of an array of objects:
- * {@code {"entries":[{"position":"Super Sent.","position":"Super Sent., lib. 1 q. 1 a. 1 arg. 1.","text":"..."}]}}
+ * {@code {"entries":[{"work":"Super Sent.","position":"Super Sent., lib. 1 q. 1 a. 1 arg. 1.","text":"..."}]}}
  * <p>
  * Copyright &copy; 2023-2024, Daniele Di Salvo
  *
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class ITParser {
 
-    private static final String USAGE = "Usage: java -jar it-parser-3.0.jar input";
+    private static final String USAGE = "Usage: java -jar it-parser-3.0.1.jar input";
 
     private static final String CSV_FILE = "entries.csv";
     private static final String JSON_FILE = "entries.json";

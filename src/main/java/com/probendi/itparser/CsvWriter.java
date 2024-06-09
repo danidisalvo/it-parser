@@ -27,6 +27,6 @@ public class CsvWriter implements Writer {
                 bw.write(entry.toCsv());
             }
         }
-        System.out.printf("Written %d entries to %s%n", entries.size(), name);
+        System.out.printf("Written %d entries to %s\n", entries.size(), name);
     }
 }

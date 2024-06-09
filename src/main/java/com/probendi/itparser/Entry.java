@@ -36,7 +36,7 @@ public record Entry(int caseNumber,
      * @param caseNumber  the case number
      * @param placeNumber the place number
      * @param work        the work
-     * @param position    the position with
+     * @param position    the position within the work
      * @param text        the text
      */
     public Entry {

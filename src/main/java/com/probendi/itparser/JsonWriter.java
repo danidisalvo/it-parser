@@ -32,6 +32,6 @@ public class JsonWriter implements Writer {
             }
             bw.append("\n]}");
         }
-        System.out.printf("Written %d entries to %s%n", entries.size(), name);
+        System.out.printf("Written %d entries to %s\n", entries.size(), name);
     }
 }
